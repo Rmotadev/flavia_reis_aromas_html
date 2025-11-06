@@ -25,20 +25,69 @@ function toggleTip(element) {
 }
 
 // ========================================
-// FUNÇÃO: Smooth Scroll para Links Internos
+// FUNÇÃO: Smooth Scroll Suave para Links Internos
 // ========================================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+function smoothScrollTo(element, duration = 800) {
+    const navbar = document.querySelector('.navbar');
+    const navbarHeight = navbar ? navbar.offsetHeight : 0;
+    const targetPosition = element.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20; // 20px de espaço extra
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    let startTime = null;
+
+    // Função de easing suave (ease-in-out-cubic)
+    function easeInOutCubic(t) {
+        return t < 0.5 
+            ? 4 * t * t * t 
+            : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function animation(currentTime) {
+        if (startTime === null) {
+            startTime = currentTime;
         }
+        
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+        
+        window.scrollTo({
+            top: startPosition + distance * ease,
+            behavior: 'auto' // Usamos 'auto' porque controlamos manualmente
+        });
+        
+        if (progress < 1) {
+            requestAnimationFrame(animation);
+        }
+    }
+
+    requestAnimationFrame(animation);
+}
+
+// Aplica smooth scroll aos links da navbar
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            
+            if (targetId === '#') return; // Ignora links vazios
+            
+            const target = document.querySelector(targetId);
+            
+            if (target) {
+                smoothScrollTo(target, 800); // 800ms para uma transição suave e leve
+            }
+        });
     });
-});
+}
+
+// Inicializa o smooth scroll
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSmoothScroll);
+} else {
+    initSmoothScroll();
+}
 
 // ========================================
 // FUNÇÃO: Animação de Entrada ao Scroll
@@ -121,10 +170,63 @@ function validateForm(formElement) {
 }
 
 // ========================================
+// FUNÇÃO: Menu Mobile (Hambúrguer)
+// ========================================
+function initMobileMenu() {
+    const toggleButton = document.querySelector('.navbar-toggle');
+    const navbarMenu = document.querySelector('.navbar-menu');
+    const menuLinks = document.querySelectorAll('.navbar-menu a');
+    
+    if (!toggleButton || !navbarMenu) return;
+    
+    // Toggle do menu
+    toggleButton.addEventListener('click', function() {
+        const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
+        
+        toggleButton.setAttribute('aria-expanded', !isExpanded);
+        navbarMenu.classList.toggle('active');
+        document.body.classList.toggle('menu-open');
+    });
+    
+    // Fecha o menu ao clicar em um link
+    menuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            toggleButton.setAttribute('aria-expanded', 'false');
+            navbarMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        });
+    });
+    
+    // Fecha o menu ao clicar no overlay (fundo escuro)
+    document.body.addEventListener('click', function(e) {
+        if (navbarMenu.classList.contains('active')) {
+            // Se clicar fora do menu e fora do botão, fecha o menu
+            if (!navbarMenu.contains(e.target) && !toggleButton.contains(e.target)) {
+                toggleButton.setAttribute('aria-expanded', 'false');
+                navbarMenu.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+        }
+    }, true); // Usa capture phase para pegar o clique no overlay
+    
+    // Fecha o menu ao pressionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navbarMenu.classList.contains('active')) {
+            toggleButton.setAttribute('aria-expanded', 'false');
+            navbarMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        }
+    });
+}
+
+// ========================================
 // FUNÇÃO: Inicialização
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Flavia Reis Aromas - Landing Page Carregada');
+    
+    // Inicializa menu mobile
+    initMobileMenu();
     
     // Inicializa tooltips ou popovers se necessário
     // initializeTooltips();

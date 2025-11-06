@@ -54,7 +54,13 @@ html {
     scroll-padding-top: 100px;
 }
 
+/* Melhora a performance do scroll */
+* {
+    -webkit-overflow-scrolling: touch;
+}
+
 body {
+    scroll-behavior: smooth;
     font-family: var(--font-body);
     background-color: var(--background);
     color: var(--foreground);
@@ -231,6 +237,38 @@ a:hover {
 
 .navbar-menu a:hover::after {
     width: 80%;
+}
+
+.navbar-toggle {
+    display: none;
+    flex-direction: column;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    gap: 0.4rem;
+    z-index: 100;
+}
+
+.navbar-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--foreground);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.navbar-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+}
+
+.navbar-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
 }
 
 /* ========================================
@@ -709,15 +747,79 @@ a:hover {
         display: none;
     }
 
+    .navbar-toggle {
+        display: flex;
+    }
+
     .navbar-menu {
-        flex-wrap: wrap;
-        gap: var(--spacing-sm);
-        justify-content: center;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        max-width: 300px;
+        height: 100vh;
+        background-color: var(--card-bg);
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 5rem 2rem 2rem;
+        gap: 0;
+        transition: right 0.3s ease;
+        z-index: 99;
+        overflow-y: auto;
+    }
+
+    .navbar-menu.active {
+        right: 0;
+    }
+
+    .navbar-menu li {
+        width: 100%;
+        border-bottom: 1px solid var(--border);
     }
 
     .navbar-menu a {
-        font-size: var(--font-size-sm);
-        padding: var(--spacing-xs);
+        display: block;
+        width: 100%;
+        padding: var(--spacing-md) 0;
+        font-size: var(--font-size-base);
+    }
+
+    .navbar-menu a::after {
+        display: none;
+    }
+
+    /* Overlay quando menu está aberto - escurece apenas o conteúdo do site */
+    body.menu-open {
+        overflow: hidden;
+    }
+    
+    body.menu-open::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 98;
+        animation: fadeIn 0.3s ease;
+        pointer-events: auto;
+    }
+    
+    /* Garante que o menu não tenha sombra e fique acima do overlay */
+    .navbar-menu {
+        box-shadow: none;
+        z-index: 99;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
 
     .hero {
@@ -743,17 +845,14 @@ a:hover {
     }
 
     .navbar-content {
-        flex-direction: column;
-        gap: var(--spacing-sm);
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .navbar-menu {
-        gap: var(--spacing-xs);
-        font-size: 0.875rem;
-    }
-
-    .navbar-menu a {
-        font-size: 0.8rem;
+        width: 80%;
+        max-width: 280px;
     }
 
     .btn-lg {

@@ -1,61 +1,6 @@
 # Flavia Reis Aromas - Landing Page (HTML/CSS/JS)
-
-## 📄 Versão HTML Pura
-
-Esta é a versão **HTML, CSS e JavaScript puro** da landing page de Flavia Reis Aromas. Não requer nenhuma dependência ou build tool - funciona diretamente em qualquer navegador!
-
 ---
 
-## 📁 Estrutura de Arquivos
-
-```
-flavia_reis_aromas_html/
-├── index.html          # Arquivo HTML principal
-├── styles.css          # Estilos CSS
-├── script.js           # JavaScript para interatividade
-├── logo.jpg            # Logo da marca
-├── products/           # Pasta com imagens dos produtos
-│   ├── WhatsAppImage2025-11-05at19.13.13.jpeg
-│   ├── WhatsAppImage2025-11-05at19.13.14(1).jpeg
-│   ├── WhatsAppImage2025-11-05at19.13.14(2).jpeg
-│   ├── WhatsAppImage2025-11-05at19.13.14(3).jpeg
-│   ├── WhatsAppImage2025-11-05at19.13.14(4).jpeg
-│   └── WhatsAppImage2025-11-05at19.13.14.jpeg
-└── README.md           # Este arquivo
-```
-
----
-
-## 🚀 Como Usar
-
-### Opção 1: Abrir Localmente
-1. Baixe ou descompacte os arquivos
-2. Abra o arquivo `index.html` em seu navegador
-3. Pronto! A página está funcionando
-
-### Opção 2: Servir com um Servidor Local
-Se você tiver Python instalado:
-
-```bash
-# Python 3
-python -m http.server 8000
-
-# Ou Python 2
-python -m SimpleHTTPServer 8000
-```
-
-Depois acesse: `http://localhost:8000`
-
-### Opção 3: Usar Node.js (http-server)
-```bash
-npm install -g http-server
-http-server
-
-# Ou com npx (sem instalar globalmente)
-npx http-server
-```
-
----
 
 ## 🎨 Características
 
@@ -119,12 +64,6 @@ A página foi otimizada para:
 - Contato WhatsApp
 - Links úteis
 
----
-
-## 🔧 Customizações
-
-### Alterar Número do WhatsApp
-Procure por `5551993995053` nos arquivos e substitua pelo número desejado.
 
 **Locais onde aparece:**
 - `index.html` - Múltiplas ocorrências
