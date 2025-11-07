@@ -422,6 +422,7 @@ a:hover {
     border: 2px solid var(--border);
     border-radius: 0.5rem;
     transition: var(--transition);
+    cursor: pointer;
 }
 
 .benefit-card:hover {
@@ -478,6 +479,7 @@ a:hover {
     border-radius: 0.75rem;
     border: 1px solid var(--border);
     transition: var(--transition);
+    cursor: pointer;
 }
 
 .product-card:hover {
@@ -537,6 +539,7 @@ a:hover {
     gap: var(--spacing-lg);
     max-width: 1200px;
     margin: 0 auto;
+    cursor: pointer;
 }
 
 .testimonial-card {
