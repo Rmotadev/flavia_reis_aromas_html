@@ -179,44 +179,193 @@ function initMobileMenu() {
     
     if (!toggleButton || !navbarMenu) return;
     
-    // Toggle do menu
-    toggleButton.addEventListener('click', function() {
+    // Cria o overlay se não existir
+    let overlay = document.querySelector('.mobile-menu-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'mobile-menu-overlay';
+        document.body.appendChild(overlay);
+    }
+    
+    // Função para alternar o menu
+    function toggleMenu() {
         const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
         
-        toggleButton.setAttribute('aria-expanded', !isExpanded);
-        navbarMenu.classList.toggle('active');
-        document.body.classList.toggle('menu-open');
+        if (isExpanded) {
+            // Fecha o menu
+            toggleButton.setAttribute('aria-expanded', 'false');
+            navbarMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            document.body.style.overflow = ''; // Restaura o scroll
+            
+            // Remove o event listener do overlay
+            overlay.removeEventListener('click', closeMenu);
+        } else {
+            // Abre o menu
+            toggleButton.setAttribute('aria-expanded', 'true');
+            navbarMenu.classList.add('active');
+            document.body.classList.add('menu-open');
+            document.body.style.overflow = 'hidden'; // Bloqueia o scroll
+            
+            // Adiciona o event listener para fechar ao clicar fora
+            setTimeout(() => {
+                overlay.addEventListener('click', closeMenu);
+            }, 10);
+        }
+    }
+    
+    // Função para fechar o menu
+    function closeMenu() {
+        toggleButton.setAttribute('aria-expanded', 'false');
+        navbarMenu.classList.remove('active');
+        document.body.classList.remove('menu-open');
+        document.body.style.overflow = ''; // Restaura o scroll
+        overlay.removeEventListener('click', closeMenu);
+    }
+    
+    // Toggle do menu ao clicar no botão
+    toggleButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleMenu();
     });
     
     // Fecha o menu ao clicar em um link
     menuLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            toggleButton.setAttribute('aria-expanded', 'false');
-            navbarMenu.classList.remove('active');
-            document.body.classList.remove('menu-open');
-        });
+        link.addEventListener('click', closeMenu);
     });
     
-    // Fecha o menu ao clicar no overlay (fundo escuro)
-    document.body.addEventListener('click', function(e) {
-        if (navbarMenu.classList.contains('active')) {
-            // Se clicar fora do menu e fora do botão, fecha o menu
-            if (!navbarMenu.contains(e.target) && !toggleButton.contains(e.target)) {
-                toggleButton.setAttribute('aria-expanded', 'false');
-                navbarMenu.classList.remove('active');
-                document.body.classList.remove('menu-open');
-            }
+    // Fecha o menu ao redimensionar para desktop
+    function handleResize() {
+        if (window.innerWidth > 768) {
+            closeMenu();
         }
-    }, true); // Usa capture phase para pegar o clique no overlay
+    }
+    
+    // Adiciona o event listener para redimensionamento
+    window.addEventListener('resize', handleResize);
     
     // Fecha o menu ao pressionar ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && navbarMenu.classList.contains('active')) {
-            toggleButton.setAttribute('aria-expanded', 'false');
-            navbarMenu.classList.remove('active');
-            document.body.classList.remove('menu-open');
+            closeMenu();
         }
     });
+}
+
+// ========================================
+// FUNÇÃO: Lightbox para Imagens
+// ========================================
+function initImageLightbox() {
+    console.log('Inicializando lightbox...');
+    
+    const lightbox = document.getElementById('image-lightbox');
+    const lightboxImg = document.getElementById('lightbox-image');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeBtn = document.querySelector('.lightbox-close');
+    
+    // Verifica se os elementos necessários existem
+    if (!lightbox) console.error('Elemento lightbox não encontrado');
+    if (!lightboxImg) console.error('Elemento lightbox-image não encontrado');
+    if (!closeBtn) console.error('Botão de fechar do lightbox não encontrado');
+    
+    if (!lightbox || !lightboxImg || !closeBtn) return;
+    
+    // Seleciona todas as imagens dos produtos
+    const productImages = document.querySelectorAll('.product-card img');
+    console.log(`Encontradas ${productImages.length} imagens de produtos`);
+    
+    if (productImages.length === 0) {
+        console.error('Nenhuma imagem de produto encontrada');
+        return;
+    }
+    
+    // Adiciona o evento de clique nas imagens
+    productImages.forEach((img, index) => {
+        img.style.cursor = 'pointer'; // Garante que o cursor mude para pointer
+        
+        // Remove event listeners antigos para evitar duplicação
+        const newImg = img.cloneNode(true);
+        img.parentNode.replaceChild(newImg, img);
+        
+        // Adiciona o evento de clique
+        newImg.addEventListener('click', function() {
+            console.log('Imagem clicada:', newImg.src);
+            openLightbox(newImg);
+        });
+        
+        // Adiciona teclado acessível
+        newImg.setAttribute('tabindex', '0');
+        newImg.setAttribute('role', 'button');
+        newImg.setAttribute('aria-label', `Ampliar imagem ${index + 1}`);
+        
+        newImg.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                console.log('Imagem ativada por teclado:', newImg.src);
+                openLightbox(newImg);
+            }
+        });
+    });
+    
+    // Função para abrir o lightbox
+    function openLightbox(imgElement) {
+        console.log('Abrindo lightbox para:', imgElement.src);
+        lightboxImg.src = imgElement.src;
+        lightboxImg.alt = imgElement.alt || 'Imagem do produto';
+        lightboxCaption.textContent = imgElement.alt || '';
+        lightbox.classList.add('show');
+        document.body.classList.add('lightbox-open');
+        document.body.style.overflow = 'hidden';
+        
+        // Foca no botão de fechar para acessibilidade
+        closeBtn.focus();
+    }
+    
+    // Fecha o lightbox
+    function closeLightbox() {
+        console.log('Fechando lightbox');
+        lightbox.classList.remove('show');
+        document.body.classList.remove('lightbox-open');
+        document.body.style.overflow = '';
+    }
+    
+    // Fecha ao clicar no botão de fechar
+    closeBtn.addEventListener('click', closeLightbox);
+    
+    // Fecha ao clicar fora da imagem
+    lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) {
+            closeLightbox();
+        }
+    });
+    
+    // Fecha ao pressionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && lightbox.classList.contains('show')) {
+            closeLightbox();
+        }
+    });
+    
+    // Navegação por teclado
+    document.addEventListener('keydown', function(e) {
+        if (!lightbox.classList.contains('show')) return;
+        
+        const currentIndex = Array.from(productImages).findIndex(
+            img => img.src === lightboxImg.src
+        );
+        
+        if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            const nextIndex = (currentIndex + 1) % productImages.length;
+            openLightbox(productImages[nextIndex]);
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const prevIndex = (currentIndex - 1 + productImages.length) % productImages.length;
+            openLightbox(productImages[prevIndex]);
+        }
+    });
+    
+    console.log('Lightbox inicializado com sucesso');
 }
 
 // ========================================
@@ -227,6 +376,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializa menu mobile
     initMobileMenu();
+    
+    // Inicializa o lightbox para as imagens dos produtos
+    setTimeout(initImageLightbox, 100); // Pequeno delay para garantir que o DOM esteja pronto
     
     // Inicializa tooltips ou popovers se necessário
     // initializeTooltips();
